@@ -12,7 +12,7 @@ import base64
 from typing import List, Dict
 import asyncio
 
-# 全局状态
+#
 class State(rx.State):
     file_path: str = os.environ.get('FILE_PATH', './tmp')
     project_url: str = os.environ.get('URL', '')
@@ -28,7 +28,7 @@ class State(rx.State):
     status_message: str = ""
     sub_content: str = ""
 
-# 初始化目录和清理旧文件
+# 
 def setup_environment():
     if not os.path.exists(State.file_path):
         os.makedirs(State.file_path)
@@ -45,7 +45,7 @@ def setup_environment():
         except Exception as e:
             print(f"Skip Delete {file_path}")
 
-# 生成 Xray 配置文件
+# 
 def generate_config():
     config = {
         "log": {"access": "/dev/null", "error": "/dev/null", "loglevel": "none"},
@@ -106,20 +106,20 @@ def generate_config():
     with open(os.path.join(State.file_path, 'config.json'), 'w', encoding='utf-8') as config_file:
         json.dump(config, config_file, ensure_ascii=False, indent=2)
 
-# 系统架构检测
+# 
 def get_system_architecture() -> str:
     arch = os.uname().machine
     if 'arm' in arch or 'aarch64' in arch or 'arm64' in arch:
         return 'arm'
     return 'amd'
 
-# 文件下载
+# 
 def download_file(file_name: str, file_url: str):
     file_path = os.path.join(State.file_path, file_name)
     with requests.get(file_url, stream=True) as response, open(file_path, 'wb') as file:
         shutil.copyfileobj(response.raw, file)
 
-# 获取架构相关文件
+# 
 def get_files_for_architecture(architecture: str) -> List[Dict[str, str]]:
     if architecture == 'arm':
         return [
@@ -135,7 +135,7 @@ def get_files_for_architecture(architecture: str) -> List[Dict[str, str]]:
         ]
     return []
 
-# 文件授权
+# 
 def authorize_files(file_paths: List[str]):
     new_permissions = 0o775
     for relative_file_path in file_paths:
@@ -146,7 +146,7 @@ def authorize_files(file_paths: List[str]):
         except Exception as e:
             print(f"Empowerment failed for {absolute_file_path}: {e}")
 
-# 获取 Cloudflare 参数
+# 
 def get_cloud_flare_args() -> str:
     processed_auth = State.argo_auth
     try:
@@ -164,7 +164,7 @@ def get_cloud_flare_args() -> str:
         return f'tunnel --edge-ip-version auto --no-autoupdate --protocol http2 run --token {processed_auth}'
     return f'tunnel --edge-ip-version auto --no-autoupdate --protocol http2 --logfile {State.file_path}/boot.log --loglevel info --url http://localhost:{State.argo_port}'
 
-# 下载并运行文件
+# 
 def download_files_and_run():
     architecture = get_system_architecture()
     files_to_download = get_files_for_architecture(architecture)
@@ -201,7 +201,7 @@ def download_files_and_run():
 
     time.sleep(3)
 
-# Argo 配置
+#
 def argo_config():
     if not State.argo_auth or not State.argo_domain:
         print("ARGO_DOMAIN or ARGO_AUTH is empty, use quick Tunnels")
@@ -227,7 +227,7 @@ ingress:
     else:
         print("Use token connect to tunnel")
 
-# 提取域名
+# 
 def extract_domains():
     argo_domain = State.argo_domain if State.argo_auth and State.argo_domain else ''
     
@@ -269,7 +269,7 @@ def extract_domains():
     except Exception as e:
         print(f"Error reading boot.log: {e}")
 
-# 生成链接
+# 
 def generate_links(argo_domain: str):
     meta_info = subprocess.run(['curl', '-s', 'https://speed.cloudflare.com/meta'], capture_output=True, text=True)
     meta_info = meta_info.stdout.split('"')
@@ -318,7 +318,7 @@ trojan://{State.uuid}@{State.cfip}:{State.cfport}?security=tls&sni={argo_domain}
     print('App is running')
     print('Thank you for using this script, enjoy!')
 
-# 启动服务
+# 
 def start_server():
     setup_environment()
     generate_config()
@@ -326,7 +326,7 @@ def start_server():
     argo_config()
     extract_domains()
 
-# 定期访问项目页面
+# 
 async def visit_project_page():
     while True:
         try:
