@@ -24,7 +24,7 @@ SERVER_SECRET = os.environ.get('SERVER_SECRET', '')
 SERVER_PORT = int(os.environ.get('SERVER_PORT', '8001'))
 ENDPOINT_IP = os.environ.get('ENDPOINT_IP', 'cf.877774.xyz')
 ENDPOINT_PORT = int(os.environ.get('ENDPOINT_PORT', '443'))
-BOT_NAME = os.environ.get('BOT_NAME', 'xxx')
+BOT_NAME = os.environ.get('BOT_NAME', 'Reflex')
 TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID', '')
 TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 
