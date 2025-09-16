@@ -1,18 +1,30 @@
 name: Deploy Reflex App
 
 on:
-  #schedule:
-   # - cron: '0 0 */3 * *'  # 每3天运行一次
-  workflow_dispatch:  # 允许手动触发
+  # 当代码被推送到 main 分支时触发
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      # 第一步：获取你的代码
+      # 这个步骤会把你的 GitHub 仓库代码下载到运行器中，以便后续步骤使用。
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 第二步：部署到 Reflex Cloud
+      # 这是核心步骤，使用了 Reflex 官方提供的 GitHub Action 来执行部署。
       - name: Deploy to Reflex Cloud
         uses: reflex-dev/reflex-deploy-action@v1
         with:
+          # 认证令牌，它会安全地从 GitHub Secrets 中读取你之前设置的 REFLEX_AUTH_TOKEN
           auth_token: ${{ secrets.REFLEX_AUTH_TOKEN }}
+
+          # 项目 ID，同样从 GitHub Secrets 中读取 REFLEX_PROJECT_ID
           project_id: ${{ secrets.REFLEX_PROJECT_ID }}
-          app_directory: "cnmgfw-reflex-hello" # Optional, defaults to root
-          python_version: "3.12" # Optional
+
+          # 指定 Python 版本，如果你的项目有特定版本要求的话
+          python_version: "3.12" # 这是一个可选项，默认就是 3.12
