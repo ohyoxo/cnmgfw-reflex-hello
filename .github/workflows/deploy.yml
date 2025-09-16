@@ -30,4 +30,5 @@ jobs:
         env:
           REFLEX_AUTH_TOKEN: ${{ secrets.REFLEX_AUTH_TOKEN }}
         run: |
-          reflex deploy --url "your-app-name.reflex.run" # 把 your-app-name 替换成你想要的应用名
+          reflex deploy --url "myapps.reflex.run" # 把 your-app-name 替换成你想要的应用名
+
