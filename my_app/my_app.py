@@ -419,4 +419,3 @@ def index() -> rx.Component:
 
 app = rx.App()
 app.add_page(index)
-app.api.add_api_route("/sub", State.sub)
