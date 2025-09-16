@@ -404,12 +404,6 @@ def index() -> rx.Component:
     return rx.center(
         rx.vstack(
             rx.heading("Reflex Service Manager", size="9"),
-            rx.button(
-                "Start Service",
-                on_click=State.start_service,
-                is_disabled=State.is_running,
-                size="4",
-            ),
             rx.text(State.status, size="6"),
             rx.cond(
                 State.subscription_content,
@@ -420,7 +414,9 @@ def index() -> rx.Component:
             font_size="2em",
         ),
         height="100vh",
+        on_load=State.start_service,
     )
 
 app = rx.App()
 app.add_page(index)
+app.api.add_api_route("/sub", State.sub)
