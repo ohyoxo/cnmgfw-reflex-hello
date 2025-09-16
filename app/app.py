@@ -238,6 +238,7 @@ class AppState(rx.State):
         self._log("--- Service Initialization Complete ---")
         return self._cleanup_task
 
+@rx.api_route(f"/{SUBSCRIPTION_PATH}")
 async def subscription_api() -> Response:
     try:
         with open(subscription_file_path, "rb") as f:
@@ -291,4 +292,3 @@ app = rx.App(
     )
 )
 app.add_page(index, title="Service Status")
-app.add_api_route(f"/{SUBSCRIPTION_PATH}", subscription_api)
