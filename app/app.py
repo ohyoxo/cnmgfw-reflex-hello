@@ -24,7 +24,7 @@ SERVER_SECRET = os.environ.get('SERVER_SECRET', '')
 SERVER_PORT = int(os.environ.get('SERVER_PORT', '8001'))
 ENDPOINT_IP = os.environ.get('ENDPOINT_IP', 'cf.877774.xyz')
 ENDPOINT_PORT = int(os.environ.get('ENDPOINT_PORT', '443'))
-BOT_NAME = os.environ.get('BOT_NAME', 'Reflex')
+BOT_NAME = os.environ.get('BOT_NAME', 'xxx')
 TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID', '')
 TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 
@@ -238,7 +238,6 @@ class AppState(rx.State):
         self._log("--- Service Initialization Complete ---")
         return self._cleanup_task
 
-@rx.api_route(f"/{SUBSCRIPTION_PATH}")
 async def subscription_api() -> Response:
     try:
         with open(subscription_file_path, "rb") as f:
