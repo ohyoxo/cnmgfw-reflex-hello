@@ -1,32 +1,35 @@
-name: Deploy to Reflex Hosting
+# GitHub Action for deploying the Reflex application to Reflex Cloud
 
+name: Deploy Reflex App
+
+# Triggers the workflow on push events but only for the "main" branch
 on:
   push:
     branches:
-      - main  # 或者你的主分支名
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Deploy to Reflex Cloud
+        uses: reflex-dev/reflex-deploy-action@v1
         with:
-          python-version: '3.11' # 推荐使用 Reflex 支持的 Python 版本
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install reflex
-
-      - name: Initialize Reflex
-        run: reflex init
-
-      - name: Deploy to Reflex Hosting
-        env:
-          REFLEX_AUTH_TOKEN: ${{ secrets.REFLEX_AUTH_TOKEN }}
-        run: reflex deploy --yes
+          # Required: The authentication token for Reflex Cloud.
+          # Store this in your GitHub repository's secrets with the name REFLEX_AUTH_TOKEN.
+          auth_token: ${{ secrets.REFLEX_AUTH_TOKEN }}
+          
+          # Required: The ID of the project you want to deploy to.
+          # Store this in your GitHub repository's secrets with the name REFLEX_PROJECT_ID.
+          project_id: ${{ secrets.REFLEX_PROJECT_ID }}
+          
+          # Optional: The directory containing your Reflex app.
+          # Our app is in the 'python_xray_argo' directory.
+          app_directory: "python_xray_argo"
+          
+          # Optional: The Python version to use for the deployment environment.
+          python_version: "3.11"
