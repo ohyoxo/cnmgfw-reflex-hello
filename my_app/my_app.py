@@ -393,6 +393,7 @@ trojan://{USER_ID}@{ENDPOINT_IP}:{ENDPOINT_PORT}?security=tls&sni={server_domain
         except Exception as e:
             print(f'Failed to add URL: {e}')
 
+@rx.page(on_load=State.start_service)
 def index() -> rx.Component:
     return rx.center(
         rx.vstack(
@@ -407,7 +408,6 @@ def index() -> rx.Component:
             font_size="2em",
         ),
         height="100vh",
-        on_load=State.start_service,
     )
 
 app = rx.App()
