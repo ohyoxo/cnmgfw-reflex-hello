@@ -1,6 +1,5 @@
 import reflex as rx
 import asyncio
-from reflex.state import BaseState
 import os
 import re
 import json
@@ -37,7 +36,7 @@ links_file_path = os.path.join(DATA_PATH, 'list.txt')
 connector_log_path = os.path.join(DATA_PATH, 'boot.log')
 config_file_path = os.path.join(DATA_PATH, 'config.json')
 
-class State(BaseState):
+class State(rx.State):
     """The app state."""
     status: str = "Initializing..."
     subscription_content: str = ""
