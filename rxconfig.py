@@ -1,5 +1,0 @@
-import reflex as rx
-
-config = rx.Config(
-    app_name="python_xray_argo",
-)
