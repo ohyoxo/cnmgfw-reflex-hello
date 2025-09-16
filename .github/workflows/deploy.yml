@@ -19,10 +19,10 @@ jobs:
       # 这是核心步骤，使用了 Reflex 官方提供的 GitHub Action 来执行部署。
       - name: Deploy to Reflex Cloud
         uses: reflex-dev/reflex-deploy-action@v1
+        env:
+          # 为旧版 Reflex 设置认证令牌环境变量
+          REFLEX_AUTH_TOKEN: ${{ secrets.REFLEX_AUTH_TOKEN }}
         with:
-          # 认证令牌，它会安全地从 GitHub Secrets 中读取你之前设置的 REFLEX_AUTH_TOKEN
-          auth_token: ${{ secrets.REFLEX_AUTH_TOKEN }}
-
           # 项目 ID，同样从 GitHub Secrets 中读取 REFLEX_PROJECT_ID
           project_id: ${{ secrets.REFLEX_PROJECT_ID }}
 
