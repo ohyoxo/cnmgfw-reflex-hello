@@ -1,7 +1,6 @@
-name: Deploy Reflex App
+name: Deploy Reflex App Manually
 
 on:
-  # 当代码被推送到 main 分支时触发
   push:
     branches:
       - main
@@ -10,21 +9,25 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      # 第一步：获取你的代码
-      # 这个步骤会把你的 GitHub 仓库代码下载到运行器中，以便后续步骤使用。
+      # 步骤 1: 获取您的代码
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 第二步：部署到 Reflex Cloud
-      # 这是核心步骤，使用了 Reflex 官方提供的 GitHub Action 来执行部署。
-      - name: Deploy to Reflex Cloud
-        uses: reflex-dev/reflex-deploy-action@v1
-        env:
-          # 为旧版 Reflex 设置认证令牌环境变量
-          REFLEX_AUTH_TOKEN: ${{ secrets.REFLEX_AUTH_TOKEN }}
+      # 步骤 2: 设置 Python 环境
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          # 项目 ID，同样从 GitHub Secrets 中读取 REFLEX_PROJECT_ID
-          project_id: ${{ secrets.REFLEX_PROJECT_ID }}
+          python-version: '3.12'
 
-          # 指定 Python 版本，如果你的项目有特定版本要求的话
-          python_version: "3.12" # 这是一个可选项，默认就是 3.12
+      # 步骤 3: 安装项目依赖
+      # 这一步会根据 requirements.txt 安装我们锁定的 reflex==0.3.9 版本
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 步骤 4: 执行部署命令
+      # 我们直接运行 reflex deploy 命令，并通过 env 设置认证令牌
+      # --non-interactive 参数确保它在自动化脚本中能顺利运行
+      - name: Run Reflex Deploy
+        env:
+          REFLEX_AUTH_TOKEN: ${{ secrets.REFLEX_AUTH_TOKEN }}
+        run: reflex deploy --project ${{ secrets.REFLEX_PROJECT_ID }} --non-interactive
