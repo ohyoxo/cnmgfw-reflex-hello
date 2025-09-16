@@ -1,3 +1,2 @@
-reflex==0.3.9
+reflex
 requests
-fastapi
