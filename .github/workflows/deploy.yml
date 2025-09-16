@@ -1,33 +1,33 @@
-name: Deploy Reflex App Manually
+name: Deploy to Reflex Hosting
 
 on:
   push:
     branches:
-      - main
+      - main  # 或者你的主分支名
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
-      # 步骤 1: 获取您的代码
-      - name: Checkout code
-        uses: actions/checkout@v4
 
-      # 步骤 2: 设置 Python 环境
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: '3.11' # 推荐使用 Reflex 支持的 Python 版本
 
-      # 步骤 3: 安装项目依赖
-      # 这一步会根据 requirements.txt 安装我们锁定的 reflex==0.3.9 版本
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          pip install reflex
 
-      # 步骤 4: 执行部署命令
-      # 我们直接运行 reflex deploy 命令，并通过 env 设置认证令牌
-      # --non-interactive 参数确保它在自动化脚本中能顺利运行
-      - name: Run Reflex Deploy
+      - name: Initialize Reflex
+        run: reflex init
+
+      - name: Deploy to Reflex Hosting
         env:
           REFLEX_AUTH_TOKEN: ${{ secrets.REFLEX_AUTH_TOKEN }}
-        run: reflex deploy --project ${{ secrets.REFLEX_PROJECT_ID }} --non-interactive
+        run: |
+          reflex deploy --url "your-app-name.reflex.run" # 把 your-app-name 替换成你想要的应用名
