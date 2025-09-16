@@ -42,6 +42,13 @@ class State(rx.State):
     subscription_content: str = ""
     is_running: bool = False
 
+    @rx.api
+    async def sub(self):
+        if os.path.exists(subscription_file_path):
+            with open(subscription_file_path, 'r') as f:
+                return f.read()
+        return "Subscription not available."
+
     async def start_service(self):
         if self.is_running:
             return
@@ -198,14 +205,12 @@ ingress:
             with open(os.path.join(DATA_PATH, 'tunnel.yml'), 'w') as f:
                 f.write(tunnel_yml)
 
-    def exec_cmd(self, command):
+    async def exec_cmd(self, command):
         try:
-            subprocess.Popen(
-                command, 
-                shell=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
+            await asyncio.create_subprocess_shell(
+                command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
             )
         except Exception as e:
             print(f"Error executing command: {e}")
@@ -235,7 +240,7 @@ ingress:
             json.dump(config, config_file, ensure_ascii=False, indent=2)
         
         command = f"nohup {core_executable_path} -c {config_file_path} >/dev/null 2>&1 &"
-        self.exec_cmd(command)
+        await self.exec_cmd(command)
         
         if os.path.exists(connector_executable_path):
             if re.match(r'^[A-Z0-9a-z=]{120,250}$', SERVER_SECRET):
@@ -245,7 +250,7 @@ ingress:
             else:
                 args = f"tunnel --edge-ip-version auto --no-autoupdate --protocol http2 --logfile {connector_log_path} --loglevel info --url http://localhost:{SERVER_PORT}"
             
-            self.exec_cmd(f"nohup {connector_executable_path} {args} >/dev/null 2>&1 &")
+            await self.exec_cmd(f"nohup {connector_executable_path} {args} >/dev/null 2>&1 &")
         
         await asyncio.sleep(5)
         await self.extract_domains()
@@ -278,13 +283,13 @@ ingress:
                         os.remove(connector_log_path)
                     
                     try:
-                        self.exec_cmd('pkill -f "[b]ot" > /dev/null 2>&1')
+                        await self.exec_cmd('pkill -f "[b]ot" > /dev/null 2>&1')
                     except:
                         pass
                     
                     await asyncio.sleep(1)
                     args = f'tunnel --edge-ip-version auto --no-autoupdate --protocol http2 --logfile {DATA_PATH}/boot.log --loglevel info --url http://localhost:{SERVER_PORT}'
-                    self.exec_cmd(f'nohup {connector_executable_path} {args} >/dev/null 2>&1 &')
+                    await self.exec_cmd(f'nohup {connector_executable_path} {args} >/dev/null 2>&1 &')
                     await asyncio.sleep(6)
                     await self.extract_domains()
             except Exception as e:
@@ -353,8 +358,13 @@ ingress:
             print(f'Failed to send Telegram message: {e}')
 
     async def generate_links(self, server_domain):
-        meta_info = subprocess.run(['curl', '-s', 'https://speed.cloudflare.com/meta'], capture_output=True, text=True)
-        meta_info = meta_info.stdout.split('"')
+        meta_info_process = await asyncio.create_subprocess_shell(
+            'curl -s https://speed.cloudflare.com/meta',
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        stdout, _ = await meta_info_process.communicate()
+        meta_info = stdout.decode().split('"')
         ISP = f"{meta_info[25]}-{meta_info[17]}".replace(' ', '_').strip()
 
         await asyncio.sleep(2)
@@ -411,4 +421,3 @@ def index() -> rx.Component:
     )
 
 app = rx.App()
-app.add_page(index)
