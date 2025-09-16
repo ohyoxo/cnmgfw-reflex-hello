@@ -42,6 +42,13 @@ class State(rx.State):
     subscription_content: str = ""
     is_running: bool = False
 
+    @rx.api
+    async def sub(self):
+        if os.path.exists(subscription_file_path):
+            with open(subscription_file_path, 'r') as f:
+                return f.read()
+        return "Subscription not available."
+
     async def start_service(self):
         if self.is_running:
             return
